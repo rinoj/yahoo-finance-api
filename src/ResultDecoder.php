@@ -19,12 +19,13 @@ class ResultDecoder
     public const SPLIT_DATA_HEADER_LINE = ['Date', 'Stock Splits'];
     public const SEARCH_RESULT_FIELDS = ['symbol', 'name', 'exch', 'type', 'exchDisp', 'typeDisp'];
     public const QUOTE_FIELDS_MAP = [
+        'id' => ValueMapperInterface::TYPE_INT,
+        'code' => ValueMapperInterface::TYPE_STRING,
+        'type' => ValueMapperInterface::TYPE_STRING,
+        'digits' => ValueMapperInterface::TYPE_INT,
+        'digits' => ValueMapperInterface::TYPE_INT,
         'ask' => ValueMapperInterface::TYPE_FLOAT,
-        'askSize' => ValueMapperInterface::TYPE_INT,
-        'averageDailyVolume10Day' => ValueMapperInterface::TYPE_INT,
-        'averageDailyVolume3Month' => ValueMapperInterface::TYPE_INT,
         'bid' => ValueMapperInterface::TYPE_FLOAT,
-        'bidSize' => ValueMapperInterface::TYPE_INT,
         'bookValue' => ValueMapperInterface::TYPE_FLOAT,
         'currency' => ValueMapperInterface::TYPE_STRING,
         'dividendDate' => ValueMapperInterface::TYPE_DATE,
@@ -34,7 +35,6 @@ class ResultDecoder
         'epsForward' => ValueMapperInterface::TYPE_FLOAT,
         'epsTrailingTwelveMonths' => ValueMapperInterface::TYPE_FLOAT,
         'exchange' => ValueMapperInterface::TYPE_STRING,
-        'exchangeDataDelayedBy' => ValueMapperInterface::TYPE_INT,
         'exchangeTimezoneName' => ValueMapperInterface::TYPE_STRING,
         'exchangeTimezoneShortName' => ValueMapperInterface::TYPE_STRING,
         'fiftyDayAverage' => ValueMapperInterface::TYPE_FLOAT,
@@ -47,7 +47,6 @@ class ResultDecoder
         'fiftyTwoWeekLowChange' => ValueMapperInterface::TYPE_FLOAT,
         'fiftyTwoWeekLowChangePercent' => ValueMapperInterface::TYPE_FLOAT,
         'financialCurrency' => ValueMapperInterface::TYPE_STRING,
-        'forwardPE' => ValueMapperInterface::TYPE_FLOAT,
         'fullExchangeName' => ValueMapperInterface::TYPE_STRING,
         'gmtOffSetMilliseconds' => ValueMapperInterface::TYPE_INT,
         'language' => ValueMapperInterface::TYPE_STRING,
@@ -56,14 +55,6 @@ class ResultDecoder
         'marketCap' => ValueMapperInterface::TYPE_INT,
         'marketState' => ValueMapperInterface::TYPE_STRING,
         'messageBoardId' => ValueMapperInterface::TYPE_STRING,
-        'postMarketChange' => ValueMapperInterface::TYPE_FLOAT,
-        'postMarketChangePercent' => ValueMapperInterface::TYPE_FLOAT,
-        'postMarketPrice' => ValueMapperInterface::TYPE_FLOAT,
-        'postMarketTime' => ValueMapperInterface::TYPE_DATE,
-        'preMarketChange' => ValueMapperInterface::TYPE_FLOAT,
-        'preMarketChangePercent' => ValueMapperInterface::TYPE_FLOAT,
-        'preMarketPrice' => ValueMapperInterface::TYPE_FLOAT,
-        'preMarketTime' => ValueMapperInterface::TYPE_DATE,
         'priceHint' => ValueMapperInterface::TYPE_INT,
         'priceToBook' => ValueMapperInterface::TYPE_FLOAT,
         'openInterest' => ValueMapperInterface::TYPE_FLOAT,
@@ -77,7 +68,6 @@ class ResultDecoder
         'regularMarketPreviousClose' => ValueMapperInterface::TYPE_FLOAT,
         'regularMarketPrice' => ValueMapperInterface::TYPE_FLOAT,
         'regularMarketTime' => ValueMapperInterface::TYPE_DATE,
-        'regularMarketVolume' => ValueMapperInterface::TYPE_INT,
         'sharesOutstanding' => ValueMapperInterface::TYPE_INT,
         'shortName' => ValueMapperInterface::TYPE_STRING,
         'sourceInterval' => ValueMapperInterface::TYPE_INT,
@@ -241,7 +231,7 @@ class ResultDecoder
         return new SplitData($date, $stockSplits);
     }
 
-    public function transformQuotes(string $responseBody): array
+    public function transformQuotes(string $responseBody, $pairs): array
     {
         $decoded = json_decode($responseBody, true);
         if (!isset($decoded['quoteResponse']['result']) || !\is_array($decoded['quoteResponse']['result'])) {
@@ -249,16 +239,19 @@ class ResultDecoder
         }
 
         $results = $decoded['quoteResponse']['result'];
-
         // Single element is returned directly in "quote"
-        return array_map(function (array $item) {
-            return $this->createQuote($item);
+
+        return array_map(function (array $item) use ($results, $pairs) {
+            $index = array_search($item, $results);
+            $pairs[$index];
+            return $this->createQuote($item, $pairs[$index]);
         }, $results);
     }
 
-    private function createQuote(array $json): Quote
+    private function createQuote(array $json, $pair): Quote
     {
         $mappedValues = [];
+        $json = array_merge($json, $pair->toArray());
         foreach ($json as $field => $value) {
             if (\array_key_exists($field, self::QUOTE_FIELDS_MAP)) {
                 $type = self::QUOTE_FIELDS_MAP[$field];
@@ -269,7 +262,6 @@ class ResultDecoder
                 }
             }
         }
-
         return new Quote($mappedValues);
     }
 }

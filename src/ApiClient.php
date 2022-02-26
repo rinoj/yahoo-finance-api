@@ -149,9 +149,9 @@ class ApiClient
      *
      * @return Quote[]
      */
-    public function getQuotes(array $symbols): array
+    public function getQuotes(array $symbols, object $pairs): array
     {
-        return $this->fetchQuotes($symbols);
+        return $this->fetchQuotes($symbols, $pairs);
     }
 
     /**
@@ -185,12 +185,12 @@ class ApiClient
      *
      * @return Quote[]
      */
-    private function fetchQuotes(array $symbols): array
+    private function fetchQuotes(array $symbols, object $pairs): array
     {
-        $url = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols='.urlencode(implode(',', $symbols));
+        $url = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols='.urlencode(implode(',', $pairs->pluck('code')->toArray()));
         $responseBody = (string) $this->client->request('GET', $url)->getBody();
 
-        return $this->resultDecoder->transformQuotes($responseBody);
+        return $this->resultDecoder->transformQuotes($responseBody, $pairs);
     }
 
     private function getHistoricalDataResponseBody(string $symbol, string $interval, \DateTimeInterface $startDate, \DateTimeInterface $endDate, string $filter): string

@@ -7,21 +7,9 @@ namespace Scheb\YahooFinanceApi\Results;
 class Quote implements \JsonSerializable
 {
     private $ask;
-    private $askSize;
-    private $averageDailyVolume10Day;
-    private $averageDailyVolume3Month;
     private $bid;
-    private $bidSize;
-    private $bookValue;
     private $currency;
-    private $dividendDate;
-    private $earningsTimestamp;
-    private $earningsTimestampStart;
-    private $earningsTimestampEnd;
-    private $epsForward;
-    private $epsTrailingTwelveMonths;
     private $exchange;
-    private $exchangeDataDelayedBy;
     private $exchangeTimezoneName;
     private $exchangeTimezoneShortName;
     private $fiftyDayAverage;
@@ -33,8 +21,6 @@ class Quote implements \JsonSerializable
     private $fiftyTwoWeekLow;
     private $fiftyTwoWeekLowChange;
     private $fiftyTwoWeekLowChangePercent;
-    private $financialCurrency;
-    private $forwardPE;
     private $fullExchangeName;
     private $gmtOffSetMilliseconds;
     private $language;
@@ -43,17 +29,7 @@ class Quote implements \JsonSerializable
     private $marketCap;
     private $marketState;
     private $messageBoardId;
-    private $postMarketChange;
-    private $postMarketChangePercent;
-    private $postMarketPrice;
-    private $postMarketTime;
-    private $preMarketChange;
-    private $preMarketChangePercent;
-    private $preMarketPrice;
-    private $preMarketTime;
     private $priceHint;
-    private $priceToBook;
-    private $openInterest;
     private $quoteSourceName;
     private $quoteType;
     private $regularMarketChange;
@@ -64,18 +40,14 @@ class Quote implements \JsonSerializable
     private $regularMarketPreviousClose;
     private $regularMarketPrice;
     private $regularMarketTime;
-    private $regularMarketVolume;
-    private $sharesOutstanding;
     private $shortName;
     private $sourceInterval;
     private $symbol;
     private $tradeable;
-    private $trailingAnnualDividendRate;
-    private $trailingAnnualDividendYield;
-    private $trailingPE;
     private $twoHundredDayAverage;
     private $twoHundredDayAverageChange;
     private $twoHundredDayAverageChangePercent;
+    private $type;
 
     public function __construct(array $values)
     {
@@ -94,29 +66,9 @@ class Quote implements \JsonSerializable
         return $this->ask;
     }
 
-    public function getAskSize(): ?int
-    {
-        return $this->askSize;
-    }
-
-    public function getAverageDailyVolume10Day(): ?int
-    {
-        return $this->averageDailyVolume10Day;
-    }
-
-    public function getAverageDailyVolume3Month(): ?int
-    {
-        return $this->averageDailyVolume3Month;
-    }
-
     public function getBid(): ?float
     {
         return $this->bid;
-    }
-
-    public function getBidSize(): ?int
-    {
-        return $this->bidSize;
     }
 
     public function getBookValue(): ?float
