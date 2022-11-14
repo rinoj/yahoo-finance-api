@@ -187,7 +187,7 @@ class ApiClient
      */
     private function fetchQuotes(array $symbols, object $pairs): array
     {
-        $url = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols='.urlencode(implode(',', $pairs->pluck('code')->toArray()));
+        $url = 'https://query2.finance.yahoo.com/v7/finance/quote?symbols='.urlencode(implode(',', $pairs->pluck('code')->toArray()));
         $responseBody = (string) $this->client->request('GET', $url)->getBody();
 
         return $this->resultDecoder->transformQuotes($responseBody, $pairs);
@@ -201,7 +201,7 @@ class ApiClient
         $responseBody = (string) $this->client->request('GET', $initialUrl, ['cookies' => $cookieJar])->getBody();
         $crumb = $this->resultDecoder->extractCrumb($responseBody);
 
-        $dataUrl = 'https://query1.finance.yahoo.com/v7/finance/download/'.urlencode($symbol).'?period1='.$startDate->getTimestamp().'&period2='.$endDate->getTimestamp().'&interval='.$interval.'&events='.$filter.'&crumb='.urlencode($crumb);
+        $dataUrl = 'https://query2.finance.yahoo.com/v7/finance/download/'.urlencode($symbol).'?period1='.$startDate->getTimestamp().'&period2='.$endDate->getTimestamp().'&interval='.$interval.'&events='.$filter.'&crumb='.urlencode($crumb);
 
         return (string) $this->client->request('GET', $dataUrl, ['cookies' => $cookieJar])->getBody();
     }
